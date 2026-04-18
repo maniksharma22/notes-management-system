@@ -1,8 +1,10 @@
 import { useEffect, useState } from 'react';
-import { Trash2, Edit2, Search, SearchX, Calendar, Clock, Pin, PlusCircle } from 'lucide-react';
+import { Trash2, Edit2, Search, SearchX, Calendar, Clock, Pin, PlusCircle, ChevronRight } from 'lucide-react';
 import apiService from '../services/apiService';
 
 const NoteCard = ({ note, onEdit, onView, setDeleteId, onPin }) => {
+    const isBigNote = note.content && note.content.replace(/<[^>]*>/g, '').length > 150;
+
     return (
         <div 
             onClick={() => onView(note)} 
@@ -32,7 +34,17 @@ const NoteCard = ({ note, onEdit, onView, setDeleteId, onPin }) => {
                 <span className="flex items-center gap-1.5"><Clock size={13} />{note.updatedAt ? new Date(note.updatedAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : ""}</span>
             </div>
 
-            <div className="flex justify-end pt-4 border-t border-gray-50 mt-auto">
+            <div className="flex items-center justify-between pt-4 border-t border-gray-50 mt-auto">
+                <div>
+                    {isBigNote && (
+                        <button 
+                            onClick={(e) => { e.stopPropagation(); onView(note); }}
+                            className="flex items-center gap-1 text-[11px] font-black uppercase tracking-tighter text-indigo-600 hover:text-indigo-700 cursor-pointer"
+                        >
+                            View More <ChevronRight size={14} />
+                        </button>
+                    )}
+                </div>
                 <div className="flex gap-1" onClick={(e) => e.stopPropagation()}>
                     <button onClick={() => onEdit(note)} className="p-2 rounded-lg bg-gray-50 text-gray-600 hover:bg-indigo-50 hover:text-indigo-600 transition-colors cursor-pointer"><Edit2 size={16} /></button>
                     <button onClick={() => setDeleteId(note.id)} className="p-2 rounded-lg bg-gray-50 text-gray-600 hover:bg-red-50 hover:text-red-600 transition-colors cursor-pointer"><Trash2 size={16} /></button>

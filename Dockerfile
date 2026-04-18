@@ -2,17 +2,19 @@
 FROM eclipse-temurin:17-jdk-alpine AS build
 WORKDIR /app
 
-# Copy the backend content
-COPY backend/ .
+# Copy EVERYTHING to be safe
+COPY . .
 
-# Debug: Show files in logs to confirm path is correct
-RUN ls -la
+# Find where mvnw is and move it to the current WORKDIR
+RUN find . -name "mvnw" -exec cp {} . \;
+RUN find . -name "pom.xml" -exec cp {} . \;
+RUN find . -name "src" -type d -exec cp -r {} . \;
 
-# Fix Windows line endings and permissions
+# Fix line endings and permissions
 RUN tr -d '\r' < mvnw > mvnw_unix && mv mvnw_unix mvnw
 RUN chmod +x ./mvnw
 
-# Build the jar
+# Build
 RUN ./mvnw clean package -DskipTests
 
 # Stage 2: Run the application

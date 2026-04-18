@@ -2,24 +2,23 @@
 FROM maven:3.8.5-openjdk-17-slim AS build
 WORKDIR /app
 
-# Try to copy pom.xml from root or backend
-COPY pom.xml* backend/pom.xml* ./
+# Copy the pom.xml from the specific backend subdirectory
+COPY backend/notes-management/pom.xml .
 
-# Download dependencies
+# Download dependencies to speed up subsequent builds
 RUN mvn dependency:go-offline
 
-# Try to copy src from root or backend
-COPY src ./src
-COPY backend/src ./src
+# Copy the source code from the specific backend subdirectory
+COPY backend/notes-management/src ./src
 
-# Build the jar
+# Build the application and skip tests for faster deployment
 RUN mvn clean package -DskipTests
 
 # Stage 2: Runtime
 FROM eclipse-temurin:17-jre-alpine
 WORKDIR /app
 
-# Copy the built jar
+# Copy the jar file generated in the target folder to the runtime image
 COPY --from=build /app/target/*.jar app.jar
 
 EXPOSE 8081

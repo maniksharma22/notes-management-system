@@ -1,0 +1,15 @@
+# Dependencies
+frontend/node_modules/
+
+# Production / Builds
+frontend/dist/
+backend/target/
+backend/build/
+
+# IDEs
+.idea/
+.vscode/
+*.iml
+
+# OS files
+.DS_Store

@@ -2,13 +2,17 @@
 FROM eclipse-temurin:17-jdk-alpine AS build
 WORKDIR /app
 
-# Copies everything from your local backend folder into the container
+# Copy the backend content
 COPY backend/ .
 
-# Fixes line endings and permissions for the wrapper
+# Debug: Show files in logs to confirm path is correct
+RUN ls -la
+
+# Fix Windows line endings and permissions
 RUN tr -d '\r' < mvnw > mvnw_unix && mv mvnw_unix mvnw
 RUN chmod +x ./mvnw
 
+# Build the jar
 RUN ./mvnw clean package -DskipTests
 
 # Stage 2: Run the application

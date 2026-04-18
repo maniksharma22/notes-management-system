@@ -5,6 +5,18 @@ import apiService from '../services/apiService';
 const NoteCard = ({ note, onEdit, onView, setDeleteId, onPin }) => {
     const isBigNote = note.content && note.content.replace(/<[^>]*>/g, '').length > 150;
 
+    const formatDate = (dateString) => {
+        if (!dateString) return "";
+        const date = new Date(dateString);
+        return date.toLocaleDateString();
+    };
+
+    const formatTime = (dateString) => {
+        if (!dateString) return "";
+        const date = new Date(dateString);
+        return date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hour12: true });
+    };
+
     return (
         <div 
             onClick={() => onView(note)} 
@@ -25,13 +37,14 @@ const NoteCard = ({ note, onEdit, onView, setDeleteId, onPin }) => {
             </div>
 
             <div 
-                className="text-gray-500 mb-5 text-sm flex-grow line-clamp-3 leading-relaxed pl-2 ql-editor pointer-events-none" 
+                className="text-gray-500 mb-5 text-sm flex-grow line-clamp-3 leading-relaxed pl-2 ql-editor pointer-events-none overflow-hidden" 
+                style={{ maxHeight: '4.5rem' }} 
                 dangerouslySetInnerHTML={{ __html: note.content || "" }} 
             />
 
             <div className="flex items-center gap-3 text-[10px] font-bold text-gray-400 mb-5 uppercase tracking-wider pl-2">
-                <span className="flex items-center gap-1.5"><Calendar size={13} />{note.createdAt ? new Date(note.createdAt).toLocaleDateString() : ""}</span>
-                <span className="flex items-center gap-1.5"><Clock size={13} />{note.updatedAt ? new Date(note.updatedAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : ""}</span>
+                <span className="flex items-center gap-1.5"><Calendar size={13} />{formatDate(note.updatedAt || note.createdAt)}</span>
+                <span className="flex items-center gap-1.5"><Clock size={13} />{formatTime(note.updatedAt || note.createdAt)}</span>
             </div>
 
             <div className="flex items-center justify-between pt-4 border-t border-gray-50 mt-auto">
@@ -104,6 +117,11 @@ const NoteList = ({ onEdit, onView, onError, onDeleteSuccess, onPinToggle }) => 
 
     return (
         <div className="flex flex-col h-full w-full max-w-7xl mx-auto overflow-hidden">
+            <style>{`
+                .ql-editor ol { list-style-type: decimal; padding-left: 1.5em; }
+                .ql-editor ul { list-style-type: disc; padding-left: 1.5em; }
+            `}</style>
+            
             <div className="px-4 md:px-6 pt-6 md:pt-8 pb-4 flex-shrink-0">
                 <div className="relative w-full">
                     <Search className="absolute left-4 md:left-5 top-1/2 -translate-y-1/2 text-indigo-300" size={18} />

@@ -68,7 +68,7 @@ const App = () => {
       )}
 
       <div className="md:hidden bg-white border-b border-gray-100 p-4 flex justify-between items-center z-30">
-        <h1 className="text-xl font-black text-indigo-600">DOC-AI</h1>
+        <h1 className="text-xl font-black text-indigo-600">NoteFlow</h1>
         <Menu className="cursor-pointer text-gray-600" onClick={() => setIsMenuOpen(true)} />
       </div>
 

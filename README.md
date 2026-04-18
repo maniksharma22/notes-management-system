@@ -28,7 +28,7 @@ A full-stack application built to manage, organize, and search through personal 
 
 ## Backend Configuration (application.properties)
 ```properties
-spring.datasource.url=jdbc:postgresql://[dpg-d7hrddt8nd3s7388inag-a.singapore-postgres.render.com/noteflow_db_jdx4?sslmode=require&serverTimezone=Asia/Kolkata](https://dpg-d7hrddt8nd3s7388inag-a.singapore-postgres.render.com/noteflow_db_jdx4?sslmode=require&serverTimezone=Asia/Kolkata)
+spring.datasource.url=jdbc:postgresql://<your-render-host>/<your-db-name>?sslmode=require&serverTimezone=Asia/Kolkata
 spring.datasource.username=${DB_USERNAME}
 spring.datasource.password=${DB_PASSWORD}
 spring.jpa.hibernate.ddl-auto=update

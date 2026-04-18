@@ -1,21 +1,16 @@
-# Stage 1: Build the application
-FROM eclipse-temurin:17-jdk-alpine AS build
+# Stage 1: Build using official Maven image
+FROM maven:3.8.5-openjdk-17-slim AS build
 WORKDIR /app
 
-# Copy EVERYTHING to be safe
+# Copy everything
 COPY . .
 
-# Find where mvnw is and move it to the current WORKDIR
-RUN find . -name "mvnw" -exec cp {} . \;
+# Find and move pom.xml and src to the current directory (fixes nesting)
 RUN find . -name "pom.xml" -exec cp {} . \;
 RUN find . -name "src" -type d -exec cp -r {} . \;
 
-# Fix line endings and permissions
-RUN tr -d '\r' < mvnw > mvnw_unix && mv mvnw_unix mvnw
-RUN chmod +x ./mvnw
-
-# Build
-RUN ./mvnw clean package -DskipTests
+# Build using the pre-installed 'mvn' (not the buggy ./mvnw)
+RUN mvn clean package -DskipTests
 
 # Stage 2: Run the application
 FROM eclipse-temurin:17-jre-alpine

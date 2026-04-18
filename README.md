@@ -48,8 +48,10 @@ cd notes-management-system
 # Update src/main/resources/application.properties with your credentials
 mvn clean install
 mvn spring-boot:run
+```
 
 ### 3. Frontend Setup
+```bash
 # Open a new terminal in the frontend directory
 npm install
 npm run dev

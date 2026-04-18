@@ -53,3 +53,4 @@ mvn spring-boot:run
 # Open a new terminal in the frontend directory
 npm install
 npm run dev
+```

@@ -2,23 +2,23 @@
 FROM maven:3.8.5-openjdk-17-slim AS build
 WORKDIR /app
 
-# Copy the pom file from the backend directory to the current workdir
+# 1. Copy the project file from the backend folder
 COPY backend/pom.xml .
 
-# Pre-fetch dependencies to speed up subsequent builds
+# 2. Download dependencies (this layer is cached)
 RUN mvn dependency:go-offline
 
-# Copy the source code
+# 3. Copy the source code from backend folder
 COPY backend/src ./src
 
-# Execute build
+# 4. Build the jar
 RUN mvn clean package -DskipTests
 
 # Stage 2: Runtime
 FROM eclipse-temurin:17-jre-alpine
 WORKDIR /app
 
-# Copy the built jar from the build stage
+# 5. Copy the jar from build stage to runtime stage
 COPY --from=build /app/target/*.jar app.jar
 
 EXPOSE 8081

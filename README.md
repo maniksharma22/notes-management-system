@@ -33,6 +33,7 @@ spring.datasource.username=${DB_USERNAME}
 spring.datasource.password=${DB_PASSWORD}
 spring.jpa.hibernate.ddl-auto=update
 spring.jackson.time-zone=Asia/Kolkata
+```
 
 ## 🛠 Installation & Setup
 

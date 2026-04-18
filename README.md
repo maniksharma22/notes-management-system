@@ -41,7 +41,7 @@ spring.jackson.time-zone=Asia/Kolkata
 ```bash
 git clone [https://github.com/maniksharma22/notes-management-system.git](https://github.com/maniksharma22/notes-management-system.git)
 cd notes-management-system
-
+```
 
 ### 2. Backend Setup
 # Update src/main/resources/application.properties with your credentials

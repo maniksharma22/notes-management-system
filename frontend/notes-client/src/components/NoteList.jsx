@@ -4,26 +4,27 @@ import apiService from '../services/apiService';
 
 const NoteCard = ({ note, onEdit, onView, setDeleteId, onPin }) => {
     return (
-        <div
-            onClick={() => onView(note)}
+        <div 
+            onClick={() => onView(note)} 
             className={`relative bg-white p-5 md:p-6 rounded-2xl border border-gray-100 shadow-sm transition-all duration-300 flex flex-col hover:shadow-lg group cursor-pointer hover:-translate-y-0.5 ${note.isPinned ? 'border-indigo-200 ring-1 ring-indigo-50' : ''}`}
         >
             <div className={`absolute left-0 top-0 bottom-0 w-[3px] transition-all duration-300 ${note.isPinned ? 'bg-indigo-600' : 'bg-indigo-500 opacity-0 group-hover:opacity-100 group-hover:w-[4px]'}`}></div>
-
+            
             <div className="flex justify-between items-start mb-2 pl-2">
                 <h3 className="font-bold text-base md:text-lg text-gray-900 truncate flex-1 group-hover:text-indigo-600">
                     {note.title || "Untitled Note"}
                 </h3>
-                <button
-                    onClick={(e) => { e.stopPropagation(); onPin(note); }}
-                    className={`ml-2 p-1.5 rounded-lg transition-colors cursor-pointer ${note.isPinned ? 'text-indigo-600 bg-indigo-50' : 'text-gray-300 hover:text-indigo-600'
-                        }`}
-                ></button>
+                <button 
+                    onClick={(e) => { e.stopPropagation(); onPin(note); }} 
+                    className={`ml-2 p-1.5 rounded-lg transition-colors ${note.isPinned ? 'text-indigo-600 bg-indigo-50' : 'text-gray-300 hover:text-indigo-600'}`}
+                >
+                    <Pin size={16} />
+                </button>
             </div>
 
-            <div
-                className="text-gray-500 mb-5 text-sm flex-grow line-clamp-3 leading-relaxed pl-2 ql-editor"
-                dangerouslySetInnerHTML={{ __html: note.content || "" }}
+            <div 
+                className="text-gray-500 mb-5 text-sm flex-grow line-clamp-3 leading-relaxed pl-2 ql-editor" 
+                dangerouslySetInnerHTML={{ __html: note.content || "" }} 
             />
 
             <div className="flex items-center gap-3 text-[10px] font-bold text-gray-400 mb-5 uppercase tracking-wider pl-2">
@@ -33,18 +34,9 @@ const NoteCard = ({ note, onEdit, onView, setDeleteId, onPin }) => {
 
             <div className="flex justify-end pt-4 border-t border-gray-50 mt-auto" onClick={(e) => e.stopPropagation()}>
                 <div className="flex gap-1">
-                    <button
-                        onClick={() => onEdit(note)}
-                        className="p-2 rounded-lg bg-gray-50 text-gray-600 hover:bg-indigo-50 hover:text-indigo-600 transition-colors cursor-pointer"
-                    >
-                    </button>
-                    <button
-                        onClick={() => setDeleteId(note.id)}
-                        className="p-2 rounded-lg bg-gray-50 text-gray-600 hover:bg-red-50 hover:text-red-600 transition-colors cursor-pointer"
-                    ></button>
-
+                    <button onClick={() => onEdit(note)} className="p-2 rounded-lg bg-gray-50 text-gray-600 hover:bg-indigo-50 hover:text-indigo-600 transition-colors"><Edit2 size={16} /></button>
+                    <button onClick={() => setDeleteId(note.id)} className="p-2 rounded-lg bg-gray-50 text-gray-600 hover:bg-red-50 hover:text-red-600 transition-colors"><Trash2 size={16} /></button>
                 </div>
-
             </div>
         </div>
     );
@@ -57,8 +49,8 @@ const NoteList = ({ onEdit, onView, onError, onDeleteSuccess, onPinToggle }) => 
 
     const fetchNotes = async () => {
         try {
-            const res = searchQuery && searchQuery.trim() !== ''
-                ? await apiService.searchNotes(searchQuery)
+            const res = searchQuery && searchQuery.trim() !== '' 
+                ? await apiService.searchNotes(searchQuery) 
                 : await apiService.getAllNotes();
 
             const sortedNotes = (res.data || []).sort((a, b) => {
@@ -111,10 +103,9 @@ const NoteList = ({ onEdit, onView, onError, onDeleteSuccess, onPinToggle }) => 
                     <div className="flex flex-col items-center justify-center h-full text-center">
                         <SearchX size={48} className="mb-4 text-indigo-100" />
                         <p className="text-lg font-bold text-gray-700">No notes found</p>
-                        <button
-                            onClick={onEdit}
-                            className="mt-4 flex items-center gap-2 px-5 py-2.5 bg-indigo-600 text-white rounded-xl font-semibold hover:bg-indigo-700 transition-colors cursor-pointer"
-                        ></button>
+                        <button onClick={onEdit} className="mt-4 flex items-center gap-2 px-5 py-2.5 bg-indigo-600 text-white rounded-xl font-semibold hover:bg-indigo-700 transition-colors">
+                            <PlusCircle size={18} /> Create Note
+                        </button>
                     </div>
                 ) : (
                     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6 pb-8">
@@ -131,15 +122,8 @@ const NoteList = ({ onEdit, onView, onError, onDeleteSuccess, onPinToggle }) => 
                         <h3 className="text-lg font-bold text-gray-900 mb-2">Delete Note?</h3>
                         <p className="text-gray-500 mb-6 text-sm">This action cannot be undone.</p>
                         <div className="flex gap-3">
-                            <button
-                                onClick={() => setDeleteId(null)}
-                                className="flex-1 py-3 rounded-xl bg-gray-100 font-bold text-gray-700 cursor-pointer"
-                            ></button>
-                            <button
-                                onClick={handleDelete}
-                                className="flex-1 py-3 rounded-xl bg-red-600 text-white font-bold cursor-pointer"
-                            ></button>
-
+                            <button onClick={() => setDeleteId(null)} className="flex-1 py-3 rounded-xl bg-gray-100 font-bold text-gray-700">Cancel</button>
+                            <button onClick={handleDelete} className="flex-1 py-3 rounded-xl bg-red-600 text-white font-bold">Delete</button>
                         </div>
                     </div>
                 </div>

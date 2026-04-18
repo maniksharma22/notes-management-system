@@ -16,14 +16,14 @@ const NoteCard = ({ note, onEdit, onView, setDeleteId, onPin }) => {
                 </h3>
                 <button 
                     onClick={(e) => { e.stopPropagation(); onPin(note); }} 
-                    className={`ml-2 p-1.5 rounded-lg transition-colors ${note.isPinned ? 'text-indigo-600 bg-indigo-50' : 'text-gray-300 hover:text-indigo-600'}`}
+                    className={`ml-2 p-1.5 rounded-lg transition-colors cursor-pointer z-10 ${note.isPinned ? 'text-indigo-600 bg-indigo-50' : 'text-gray-300 hover:text-indigo-600'}`}
                 >
-                    <Pin size={16} />
+                    <Pin size={16} fill={note.isPinned ? "currentColor" : "none"} />
                 </button>
             </div>
 
             <div 
-                className="text-gray-500 mb-5 text-sm flex-grow line-clamp-3 leading-relaxed pl-2 ql-editor" 
+                className="text-gray-500 mb-5 text-sm flex-grow line-clamp-3 leading-relaxed pl-2 ql-editor pointer-events-none" 
                 dangerouslySetInnerHTML={{ __html: note.content || "" }} 
             />
 
@@ -32,10 +32,10 @@ const NoteCard = ({ note, onEdit, onView, setDeleteId, onPin }) => {
                 <span className="flex items-center gap-1.5"><Clock size={13} />{note.updatedAt ? new Date(note.updatedAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : ""}</span>
             </div>
 
-            <div className="flex justify-end pt-4 border-t border-gray-50 mt-auto" onClick={(e) => e.stopPropagation()}>
-                <div className="flex gap-1">
-                    <button onClick={() => onEdit(note)} className="p-2 rounded-lg bg-gray-50 text-gray-600 hover:bg-indigo-50 hover:text-indigo-600 transition-colors"><Edit2 size={16} /></button>
-                    <button onClick={() => setDeleteId(note.id)} className="p-2 rounded-lg bg-gray-50 text-gray-600 hover:bg-red-50 hover:text-red-600 transition-colors"><Trash2 size={16} /></button>
+            <div className="flex justify-end pt-4 border-t border-gray-50 mt-auto">
+                <div className="flex gap-1" onClick={(e) => e.stopPropagation()}>
+                    <button onClick={() => onEdit(note)} className="p-2 rounded-lg bg-gray-50 text-gray-600 hover:bg-indigo-50 hover:text-indigo-600 transition-colors cursor-pointer"><Edit2 size={16} /></button>
+                    <button onClick={() => setDeleteId(note.id)} className="p-2 rounded-lg bg-gray-50 text-gray-600 hover:bg-red-50 hover:text-red-600 transition-colors cursor-pointer"><Trash2 size={16} /></button>
                 </div>
             </div>
         </div>
@@ -47,17 +47,19 @@ const NoteList = ({ onEdit, onView, onError, onDeleteSuccess, onPinToggle }) => 
     const [searchQuery, setSearchQuery] = useState('');
     const [deleteId, setDeleteId] = useState(null);
 
+    const sortNotes = (notesArray) => {
+        return [...notesArray].sort((a, b) => {
+            if (a.isPinned === b.isPinned) return new Date(b.updatedAt) - new Date(a.updatedAt);
+            return a.isPinned ? -1 : 1;
+        });
+    };
+
     const fetchNotes = async () => {
         try {
             const res = searchQuery && searchQuery.trim() !== '' 
                 ? await apiService.searchNotes(searchQuery) 
                 : await apiService.getAllNotes();
-
-            const sortedNotes = (res.data || []).sort((a, b) => {
-                if (a.isPinned === b.isPinned) return new Date(b.updatedAt) - new Date(a.updatedAt);
-                return a.isPinned ? -1 : 1;
-            });
-            setNotes(sortedNotes);
+            setNotes(sortNotes(res.data || []));
         } catch (err) {
             onError("Failed to load notes.");
         }
@@ -66,13 +68,16 @@ const NoteList = ({ onEdit, onView, onError, onDeleteSuccess, onPinToggle }) => 
     useEffect(() => { fetchNotes(); }, [searchQuery]);
 
     const handlePin = async (note) => {
+        const updatedStatus = !note.isPinned;
+        const updatedNotes = notes.map(n => n.id === note.id ? { ...n, isPinned: updatedStatus } : n);
+        setNotes(sortNotes(updatedNotes));
+
         try {
-            const updatedPinnedStatus = !note.isPinned;
-            await apiService.updateNote(note.id, { ...note, isPinned: updatedPinnedStatus });
-            fetchNotes();
-            onPinToggle(updatedPinnedStatus);
+            await apiService.updateNote(note.id, { ...note, isPinned: updatedStatus });
+            if (onPinToggle) onPinToggle(updatedStatus);
         } catch (err) {
-            onError("Failed to update pin");
+            fetchNotes();
+            onError("Failed to update pin.");
         }
     };
 
@@ -91,7 +96,7 @@ const NoteList = ({ onEdit, onView, onError, onDeleteSuccess, onPinToggle }) => 
                 <div className="relative w-full">
                     <Search className="absolute left-4 md:left-5 top-1/2 -translate-y-1/2 text-indigo-300" size={18} />
                     <input
-                        className="w-full pl-12 md:pl-14 pr-5 py-3 md:py-4 bg-white border border-gray-100 rounded-xl md:rounded-2xl outline-none focus:ring-2 focus:ring-indigo-100 transition-all text-sm md:text-base shadow-sm"
+                        className="w-full pl-12 md:pl-14 pr-5 py-3 md:py-4 bg-white border border-gray-100 rounded-xl md:rounded-2xl outline-none focus:ring-2 focus:ring-indigo-100 transition-all text-sm md:text-base shadow-sm cursor-text"
                         placeholder="Search notes..."
                         onChange={(e) => setSearchQuery(e.target.value)}
                     />
@@ -103,7 +108,7 @@ const NoteList = ({ onEdit, onView, onError, onDeleteSuccess, onPinToggle }) => 
                     <div className="flex flex-col items-center justify-center h-full text-center">
                         <SearchX size={48} className="mb-4 text-indigo-100" />
                         <p className="text-lg font-bold text-gray-700">No notes found</p>
-                        <button onClick={onEdit} className="mt-4 flex items-center gap-2 px-5 py-2.5 bg-indigo-600 text-white rounded-xl font-semibold hover:bg-indigo-700 transition-colors">
+                        <button onClick={onEdit} className="mt-4 flex items-center gap-2 px-5 py-2.5 bg-indigo-600 text-white rounded-xl font-semibold hover:bg-indigo-700 transition-colors cursor-pointer">
                             <PlusCircle size={18} /> Create Note
                         </button>
                     </div>
@@ -122,8 +127,8 @@ const NoteList = ({ onEdit, onView, onError, onDeleteSuccess, onPinToggle }) => 
                         <h3 className="text-lg font-bold text-gray-900 mb-2">Delete Note?</h3>
                         <p className="text-gray-500 mb-6 text-sm">This action cannot be undone.</p>
                         <div className="flex gap-3">
-                            <button onClick={() => setDeleteId(null)} className="flex-1 py-3 rounded-xl bg-gray-100 font-bold text-gray-700">Cancel</button>
-                            <button onClick={handleDelete} className="flex-1 py-3 rounded-xl bg-red-600 text-white font-bold">Delete</button>
+                            <button onClick={() => setDeleteId(null)} className="flex-1 py-3 rounded-xl bg-gray-100 font-bold text-gray-700 cursor-pointer hover:bg-gray-200 transition-colors">Cancel</button>
+                            <button onClick={handleDelete} className="flex-1 py-3 rounded-xl bg-red-600 text-white font-bold cursor-pointer hover:bg-red-700 transition-colors">Delete</button>
                         </div>
                     </div>
                 </div>

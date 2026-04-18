@@ -44,6 +44,7 @@ cd notes-management-system
 ```
 
 ### 2. Backend Setup
+```bash
 # Update src/main/resources/application.properties with your credentials
 mvn clean install
 mvn spring-boot:run
